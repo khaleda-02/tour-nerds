@@ -15,6 +15,13 @@ app.use((req, res, next) => {
 
 app.use("/api/tour", require("./routes/tourRoutes"));
 app.use(errorHandler);
+// Not found reqs
+app.all("*", (req, res, next) => {
+  res.status(404).json({
+    status: "Failed",
+    message: "request not found!!",
+  });
+});
 
 app.listen(3000, () => {
   console.log("app is running on 300");

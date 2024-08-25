@@ -73,7 +73,8 @@ const getTour = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const tour = await Tour.findById(id);
   if (!tour) {
-    res.status(400);
+    res.status(404);
+    // throw new Error("no tour with this id!!");
     throw new Error("no tour with this id!!");
   }
 
@@ -95,7 +96,7 @@ const updateTour = asyncHandler(async (req, res) => {
   });
 
   if (!updatedTour) {
-    res.status(400);
+    res.status(404);
     throw new Error(
       "tour not found OR something went wrong while updating the tour!!",
     );
@@ -113,6 +114,12 @@ const deleteTour = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const deletedTour = await Tour.findByIdAndDelete(id);
 
+  if (!deletedTour) {
+    res.status(404);
+    throw new Error(
+      "tour not found OR something went wrong while updating the tour!!",
+    );
+  }
   res.status(200).json({
     status: "success",
     data: null,
