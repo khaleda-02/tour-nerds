@@ -1,4 +1,4 @@
-# **Tour-Nerds**
+# **tour-nerds**
 
 ### Description
 
@@ -38,8 +38,8 @@
    ```bash
    npm install
 2. **Environment variables**:
-- **Create a .env file in the root of the project.
-- **Add the following variables (replace the values with your own):
+- Create a .env file in the root of the project.
+- Add the following variables (replace the values with your own):
    ```bash
   DATA_BASE_STR=mongodb://localhost:27017/db-name
   NODE_ENV=development
