@@ -44,6 +44,8 @@
   DATA_BASE_STR=mongodb://localhost:27017/db-name
   NODE_ENV=development
   PORT=3000
+  JWT_SECRET =jwt_secret
+   JWT_EXPIRES_IN=1d
 2. **Run the application**:
    ```bash
    npm start
