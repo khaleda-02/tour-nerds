@@ -14,6 +14,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/tour", require("./routes/tourRoutes"));
+app.use("/api/auth", require("./routes/authRoutes"));
 app.use(errorHandler);
 // Not found reqs
 app.all("*", (req, res, next) => {

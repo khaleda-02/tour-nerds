@@ -1,6 +1,5 @@
 const { Tour } = require("../models");
 const asyncHandler = require("express-async-handler");
-const { listeners } = require("../models/tourModel");
 
 //todo: add validation on createTour.
 
