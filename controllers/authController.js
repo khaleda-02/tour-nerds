@@ -37,7 +37,13 @@ const signup = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     status: "success",
-    data: { user, token },
+    data: {
+      token,
+      username: user.username,
+      name: `${user.firstName} ${user.lastName}`,
+      email: user.email,
+      role: user.role,
+    },
   });
 });
 

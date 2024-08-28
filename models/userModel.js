@@ -34,8 +34,14 @@ const UserSchema = new mongoose.Schema({
     maxlength: 12,
     select: false,
   },
+  passwordChangedAt: Date,
   photo: {
     type: String,
+  },
+  role: {
+    type: String,
+    enum: ["user", "guide", "lead-guide", "admin"],
+    default: "user",
   },
 });
 
@@ -44,5 +50,11 @@ UserSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
+
+UserSchema.methods.isPasswordChangedAfter = function (iat) {
+  if (this.passwordChangedAt)
+    return iat < parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+  return false;
+};
 const User = mongoose.model("User", UserSchema);
 module.exports = User;
