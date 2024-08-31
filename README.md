@@ -45,7 +45,11 @@
   NODE_ENV=development
   PORT=3000
   JWT_SECRET =jwt_secret
-   JWT_EXPIRES_IN=1d
+  JWT_EXPIRES_IN=1d
+  EMAIL_USERNAME=
+  EMAIL_PASSWORD= 
+  EMAIL_HOST= 
+  EMAIL_PORT= 
 2. **Run the application**:
    ```bash
    npm start

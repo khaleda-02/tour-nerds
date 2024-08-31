@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
@@ -43,10 +44,15 @@ const UserSchema = new mongoose.Schema({
     enum: ["user", "guide", "lead-guide", "admin"],
     default: "user",
   },
+  resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordTokenExpires: Date,
 });
 
 UserSchema.pre("save", async function (next) {
-  // if (!this.isModified("password")) return next(); // after trying => no need for this line, because this function will not be executed when updating, just on create & save
+  if (!this.isModified("password")) return next(); // after trying => no need for this line, because this function will not be executed when updating, just on create & save
+  // no, ti's important and should be run, ex. in case createResetPasswordToken we update the user data but not using update fun, it's find the user and then make changes on it then save it.
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
@@ -55,6 +61,24 @@ UserSchema.methods.isPasswordChangedAfter = function (iat) {
   if (this.passwordChangedAt)
     return iat < parseInt(this.passwordChangedAt.getTime() / 1000, 10);
   return false;
+};
+UserSchema.methods.createResetPasswordToken = async function () {
+  // create a token
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  // hash the token
+  const hashToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // save hashed token to the user dec
+  this.resetPasswordToken = hashToken;
+  this.resetPasswordTokenExpires = Date.now() + 60 * 60 * 1000;
+  await this.save();
+
+  // return the resetToken to the
+  return resetToken;
 };
 const User = mongoose.model("User", UserSchema);
 module.exports = User;

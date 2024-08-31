@@ -71,6 +71,24 @@ const signin = asyncHandler(async (req, res) => {
     data: { token },
   });
 });
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  // get the user email
+  const user = await User.findOne({ email });
+  if (!user) {
+    res.status(404);
+    throw new Error("user not found !!");
+  }
+
+  // create a token for the user ( and because it related to user and manipulate user's data, we should do it in the user model )
+  const resetToken = await user.createResetPasswordToken();
+
+  // send it to the user's email
+  res.status(200).json({
+    status: "success",
+  });
+});
 const updateUser = asyncHandler(async (req, res) => {
   const updateUser = await User.findOneAndUpdate(
     { username: "khaledsds-02" },
@@ -90,6 +108,7 @@ const createToken = (id) => {
 };
 module.exports = {
   signup,
-  updateUser,
   signin,
+  resetPassword,
+  updateUser,
 };
