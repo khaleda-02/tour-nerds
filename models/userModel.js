@@ -54,6 +54,8 @@ UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next(); // after trying => no need for this line, because this function will not be executed when updating, just on create & save
   // no, ti's important and should be run, ex. in case createResetPasswordToken we update the user data but not using update fun, it's find the user and then make changes on it then save it.
   this.password = await bcrypt.hash(this.password, 12);
+
+  if (!this.isNew) this.passwordChangedAt = Date.now();
   next();
 });
 
@@ -79,6 +81,18 @@ UserSchema.methods.createResetPasswordToken = async function () {
 
   // return the resetToken to the
   return resetToken;
+};
+
+UserSchema.methods.updateUserPassword = async function (
+  password,
+  resetPassword,
+) {
+  this.password = password;
+  if (resetPassword) {
+    this.resetPasswordToken = undefined;
+    this.resetPasswordTokenExpires = undefined;
+  }
+  await this.save();
 };
 const User = mongoose.model("User", UserSchema);
 module.exports = User;

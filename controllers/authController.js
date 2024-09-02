@@ -1,7 +1,9 @@
+const crypto = require("crypto");
 const { User } = require("../models");
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
+const sendEmail = reauire("../util/sendEmail.js");
 
 // @des    signup
 // @route  POST /api/auth/signup
@@ -72,7 +74,9 @@ const signin = asyncHandler(async (req, res) => {
   });
 });
 
-const resetPassword = asyncHandler(async (req, res) => {
+// forgot password => send the email to get the reset token via the email.
+// reset password => by clicking the token (that sent to user's email) this route called and getting the token from the params, then change the password based on the token if it's correct.
+const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
   // get the user email
   const user = await User.findOne({ email });
@@ -85,8 +89,59 @@ const resetPassword = asyncHandler(async (req, res) => {
   const resetToken = await user.createResetPasswordToken();
 
   // send it to the user's email
+
+  const mailOptions = {
+    to: user.email,
+    subject: "Rest Your Password using this Email (Valid for 1 Hour) ",
+    text: resetToken,
+  };
+
+  // I put the tyr/catch block here instead of put it in the sendEmail fun to get access to the res object so I can return 400 res in error case.
+  try {
+    await sendEmail(mailOptions);
+  } catch (err) {
+    res.status(400);
+    throw new Error(
+      "something went wrong when sending the email, please try again !!",
+    );
+  }
   res.status(200).json({
     status: "success",
+  });
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { password, passwordConfirm } = req.body;
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  // get the user based on the token & verify it
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordTokenExpires: { $gt: Date.now() },
+  });
+  if (!user) {
+    res.status(401);
+    throw new Error(
+      "invalid token, there's no user associated with this token!!",
+    );
+  }
+
+  // update the user password  passwordChangedAt
+  if (password !== passwordConfirm) {
+    res.status(400);
+    throw new Error("the passwordConfirm must be as same as the password!!! ");
+  }
+  await user.updateUserPassword(password, true);
+
+  // log the user in
+  const token = createToken(user._id);
+
+  res.status(201).json({
+    status: "success",
+    data: { token },
   });
 });
 const updateUser = asyncHandler(async (req, res) => {
@@ -109,6 +164,7 @@ const createToken = (id) => {
 module.exports = {
   signup,
   signin,
+  forgotPassword,
   resetPassword,
   updateUser,
 };

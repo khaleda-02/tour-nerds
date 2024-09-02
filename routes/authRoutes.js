@@ -6,7 +6,9 @@ const router = Router();
 router
   .post("/signup", authController.signup)
   .post("/signin", authController.signin)
-  .post("/reset-password", authController.resetPassword)
+  .post("/forgot-password", authController.forgotPassword)
+  .patch("/reset-password/:token", authController.resetPassword)
   .put("/update-user", authController.updateUser);
 
 module.exports = router;
+    
