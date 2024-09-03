@@ -157,7 +157,10 @@ const resetPassword = asyncHandler(async (req, res) => {
 const updatePassword = asyncHandler(async (req, res) => {
   // get the user data
   const { currentPassword, password, passwordConfirm } = req.body;
-
+  if (!currentPassword || !password || !passwordConfirm) {
+    res.status(400);
+    throw new Error("add credentials ");
+  }
   // ensure that user's old password is correct
   const user = await User.findById(req.user.id).select("+password");
   if (!user || !(await bcrypt.compare(currentPassword, user.password))) {
