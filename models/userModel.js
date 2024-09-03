@@ -58,7 +58,6 @@ UserSchema.pre("save", async function (next) {
   if (!this.isNew) this.passwordChangedAt = Date.now();
   next();
 });
-
 UserSchema.methods.isPasswordChangedAfter = function (iat) {
   if (this.passwordChangedAt)
     return iat < parseInt(this.passwordChangedAt.getTime() / 1000, 10);
@@ -93,6 +92,9 @@ UserSchema.methods.updateUserPassword = async function (
     this.resetPasswordTokenExpires = undefined;
   }
   await this.save();
+  // I used save here instead of findOneAndUpdate to run the pre save middleware and the validators in the schema(if it's exists)
+  // so if I used findOneAndUpdate it will not run the validators
+  //? so at the end don't use findOneAndUpdate in any case that related to password
 };
 const User = mongoose.model("User", UserSchema);
 module.exports = User;

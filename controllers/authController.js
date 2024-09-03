@@ -3,7 +3,7 @@ const { User } = require("../models");
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
-const sendEmail = reauire("../util/sendEmail.js");
+const sendEmail = require("../util/sendEmail.js");
 
 // @des    signup
 // @route  POST /api/auth/signup
@@ -49,6 +49,9 @@ const signup = asyncHandler(async (req, res) => {
   });
 });
 
+// @des    signin
+// @route  POST /api/auth/signin
+// @access public
 const signin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -74,8 +77,9 @@ const signin = asyncHandler(async (req, res) => {
   });
 });
 
-// forgot password => send the email to get the reset token via the email.
-// reset password => by clicking the token (that sent to user's email) this route called and getting the token from the params, then change the password based on the token if it's correct.
+// @des    forgot password=> send the email to get the reset token via the email.
+// @route  POST /api/auth/forgot-password
+// @access public
 const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
   // get the user email
@@ -89,7 +93,6 @@ const forgotPassword = asyncHandler(async (req, res) => {
   const resetToken = await user.createResetPasswordToken();
 
   // send it to the user's email
-
   const mailOptions = {
     to: user.email,
     subject: "Rest Your Password using this Email (Valid for 1 Hour) ",
@@ -110,6 +113,9 @@ const forgotPassword = asyncHandler(async (req, res) => {
   });
 });
 
+// @des    reset password => by clicking the token (that sent to user's email) this route called and getting the token from the params, then change the password based on the token if it's correct.
+// @route  PATCH /api/auth/reset-password/:token
+// @access public
 const resetPassword = asyncHandler(async (req, res) => {
   const { password, passwordConfirm } = req.body;
   const hashedToken = crypto
@@ -144,14 +150,32 @@ const resetPassword = asyncHandler(async (req, res) => {
     data: { token },
   });
 });
-const updateUser = asyncHandler(async (req, res) => {
-  const updateUser = await User.findOneAndUpdate(
-    { username: "khaledsds-02" },
-    { firstName: "updated na" },
-    { new: true, runValidators: true },
-  );
-  res.status(200).json({
-    mesage: "success",
+
+// @des    update-password
+// @route  PUT /api/auth/update-password
+// @access Protect
+const updatePassword = asyncHandler(async (req, res) => {
+  // get the user data
+  const { currentPassword, password, passwordConfirm } = req.body;
+
+  // ensure that user's old password is correct
+  const user = await User.findById(req.user.id).select("+password");
+  if (!user || !(await bcrypt.compare(currentPassword, user.password))) {
+    res.status(400);
+    throw new Error("incorrect password !!");
+  }
+
+  // update the user's password after ensuring the password is valid.
+  if (password !== passwordConfirm) {
+    res.status(400);
+    throw new Error("the passwordConfirm must be as same as the password!!! ");
+  }
+
+  await user.updateUserPassword(password, false);
+
+  res.status(201).json({
+    status: "success",
+    data: "password updated successfully ",
   });
 });
 
@@ -166,5 +190,5 @@ module.exports = {
   signin,
   forgotPassword,
   resetPassword,
-  updateUser,
+  updatePassword,
 };
