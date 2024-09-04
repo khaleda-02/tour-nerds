@@ -84,7 +84,6 @@ TourSchema.pre("save", function (next) {
   // we have access to the object that will be created after this function.
   // ex: add slug into the doc
   // this.slug = slugify(this.name, { lower: true });
-  console.log(this);
   next();
 });
 
