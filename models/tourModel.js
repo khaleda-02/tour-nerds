@@ -63,6 +63,27 @@ const TourSchema = new mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
+    startLocation: {
+      type: {
+        type: String,
+        default: "point",
+        enum: ["point"],
+      },
+      coordinate: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: { type: String, default: "point", enum: ["point"] },
+        coordinate: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    // referencing Tour guide
+    guides: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
   },
   {
     // the sec para is the schema opt, and when we need to add virtual prop we need to add this
@@ -99,7 +120,13 @@ TourSchema.pre(/^find/, function (next) {
   // TourSchema.pre('find',function(next){
   // this.find(add new conditions);
   // and we can add props to the query
-  this.example = "example";
+  // this.example = "example";
+
+  // using populate to get the user actual data instead of the Ids
+  this.populate({
+    path: "guides",
+    select: "name role email",
+  });
   next();
 });
 

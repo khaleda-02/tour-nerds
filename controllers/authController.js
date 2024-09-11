@@ -104,6 +104,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     await sendEmail(mailOptions);
   } catch (err) {
     res.status(400);
+    console.log(err);
     throw new Error(
       "something went wrong when sending the email, please try again !!",
     );
