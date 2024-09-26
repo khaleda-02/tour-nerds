@@ -1,6 +1,14 @@
 const asyncHandler = require("express-async-handler");
 const { User } = require("../models");
 
+const getMe = asyncHandler(async (req, res) => {
+  console.log(req.user, "user");
+  res.status(200).json({
+    status: "success",
+    data: req.user,
+  });
+});
+
 const updateMe = asyncHandler(async (req, res) => {
   if (req.body.password || req.body.role || req.body.email) {
     res.status(400);
@@ -40,6 +48,7 @@ const filterBody = (body, ...allowedProps) => {
 };
 
 module.exports = {
+  getMe,
   updateMe,
   deleteMe,
 };

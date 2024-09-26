@@ -95,9 +95,9 @@ const TourSchema = new mongoose.Schema(
 //? Virtual prop
 // return this.relatedProp * 12;
 //ex:
-TourSchema.virtual("weeklyTours").get(function () {
-  return this.duration / 7;
-});
+// TourSchema.virtual("weeklyTours").get(function () {
+//   return this.duration / 7;
+// });
 
 //? Document Middleware
 // run on save, create hooks,

@@ -3,7 +3,7 @@ require("dotenv").config();
 
 const app = express();
 const connectDb = require("./config/dbConnection");
-const errorHandler = require("./middlewares/errorMiddleware");
+const { errorHandler } = require("./middlewares");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const mongoSanitize = require("express-mongo-sanitize");
@@ -45,7 +45,12 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  next();
+});
 app.use("/api/tour", require("./routes/tourRoutes"));
+app.use("/api/review", require("./routes/reviewRoutes"));
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/user", require("./routes/userRoutes"));
 app.use(errorHandler);

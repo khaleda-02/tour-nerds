@@ -1,18 +1,40 @@
 const { Router } = require("express");
-const { tourController } = require("../controllers");
+const { tourController, reviewController } = require("../controllers");
 const protectRoute = require("../middlewares/protectRouteMiddleware");
 const allowedTo = require("../middlewares/allowedToMiddleware");
+const reviewRouter = require("../routes/reviewRoutes");
 const router = Router();
 
 router
   .route("/")
-  .post(tourController.createTour)
-  .get(protectRoute, allowedTo("admin"), tourController.getAllTours);
+  .post(
+    protectRoute,
+    allowedTo("admin", "lead-guide"),
+    tourController.createTour,
+  )
+  .get(protectRoute, tourController.getAllTours);
+
 router
   .route("/:id")
   .get(tourController.getTour)
-  .put(tourController.updateTour)
-  .delete(tourController.deleteTour);
+  .put(
+    protectRoute,
+    allowedTo("admin", "lead-guide"),
+    tourController.updateTour,
+  )
+  .delete(
+    protectRoute,
+    allowedTo("admin", "lead-guide"),
+    tourController.deleteTour,
+  );
+
+// tour's review routes:
+router
+  .route("/:tourId/review")
+  .post(protectRoute, allowedTo("user"), reviewController.createReview)
+  .get(reviewController.getTourReviews);
+
+router.get("/:tourId/review/:reviewId", reviewController.getTourReview);
 
 module.exports = router;
 // getAllTours

@@ -116,7 +116,7 @@ const deleteTour = asyncHandler(async (req, res) => {
   if (!deletedTour) {
     res.status(404);
     throw new Error(
-      "tour not found OR something went wrong while updating the tour!!",
+      "tour not found OR something went wrong while deleing the tour!!",
     );
   }
   res.status(200).json({

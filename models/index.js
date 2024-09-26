@@ -1,3 +1,4 @@
 const tourModel = require("./tourModel");
 const userModel = require("./userModel");
-module.exports = { Tour: tourModel, User: userModel };
+const reviewModel = require("./reviewModel");
+module.exports = { Tour: tourModel, User: userModel, Review: reviewModel };
