@@ -22,11 +22,13 @@ const updateMe = asyncHandler(async (req, res) => {
     "username",
     "photo",
   );
+
+  // adding the file name into the user's photo prop
+  if (req.file) filteredBody.photo = req.file.filename;
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
     runValidators: true,
   });
-
   res.status(200).json({
     status: "success",
     data: updatedUser,
