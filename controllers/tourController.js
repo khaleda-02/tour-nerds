@@ -89,6 +89,15 @@ const getTour = asyncHandler(async (req, res) => {
 const updateTour = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const body = req.body;
+
+  // update images & coverImage in db after uploaded
+  if (req.files.coverImage && req.files.images) {
+    body.coverImage = req.files.coverImage[0].filename;
+    body.images = [];
+    req.files.images.forEach((img) => {
+      body.images.push(img.filename);
+    });
+  }
   const updatedTour = await Tour.findByIdAndUpdate(id, body, {
     new: true,
     runValidators: true,

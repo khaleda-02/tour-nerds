@@ -2,7 +2,9 @@ const { Router } = require("express");
 const { tourController, reviewController } = require("../controllers");
 const protectRoute = require("../middlewares/protectRouteMiddleware");
 const allowedTo = require("../middlewares/allowedToMiddleware");
-const reviewRouter = require("../routes/reviewRoutes");
+const {
+  uploadTourImages,
+} = require("../middlewares/uploadImage");
 const router = Router();
 
 router
@@ -20,6 +22,7 @@ router
   .put(
     protectRoute,
     allowedTo("admin", "lead-guide"),
+    uploadTourImages,
     tourController.updateTour,
   )
   .delete(
